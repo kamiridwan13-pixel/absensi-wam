@@ -1,149 +1,196 @@
-<x-app-layout>
-    <div class="flex">
+<?php
 
-        <x-sidebar />
+namespace App\Http\Controllers;
 
-        <div class="flex-1 p-6 bg-gray-100 min-h-screen">
+use Illuminate\Http\Request;
+use App\Models\Absensi;
+use App\Models\SurveyEvent;
+use Carbon\Carbon;
 
-            <h1 class="text-2xl font-bold mb-6">Absensi Karyawan</h1>
+class AbsensiController extends Controller
+{
+    // =========================
+    // ABSEN KANTOR
+    // =========================
+    public function absenKantor(Request $request)
+    {
+        $user = auth()->user();
+        $today = now()->toDateString();
 
-            <div class="bg-white p-6 rounded-2xl shadow">
+        // =========================
+        // VALIDASI WIFI KANTOR
+        // =========================
 
-                {{-- STATUS --}}
-                <div class="mb-6">
+        // GANTI DENGAN IP WIFI KANTOR KAMU
+        $ipKantor = '103.56.80.19';
 
-                    @if($sedangSurvey)
-                        <div class="p-4 bg-blue-100 text-blue-800 rounded-lg">
-                            📍 Anda sedang dalam jadwal <b>Survey</b> hari ini
-                        </div>
+        $ipUser = $request->ip();
 
-                    @elseif(!$absen)
-                        <div class="p-4 bg-gray-100 text-gray-700 rounded-lg">
-                            🔴 Belum Absen Hari Ini
-                        </div>
-
-                    @elseif($absen->status === 'pending')
-                        <div class="p-4 bg-yellow-100 text-yellow-800 rounded-lg">
-                            🟡 Menunggu Approval (Absen Luar)
-                        </div>
-
-                    @elseif($absen->status === 'approved')
-                        <div class="p-4 bg-green-100 text-green-800 rounded-lg">
-                            🟢 Sudah Absen ({{ ucfirst($absen->tipe) }})
-                            <br>
-                            Jam Masuk: {{ $absen->jam_masuk }}
-                        </div>
-
-                    @elseif($absen->status_hadir === 'alpha')
-                        <div class="p-4 bg-red-100 text-red-800 rounded-lg">
-                            ⚫ Alpha (Tidak Masuk)
-                        </div>
-                    @endif
-
-                </div>
-
-                {{-- PILIHAN --}}
-                <div class="flex gap-4 mb-6">
-
-                    {{-- KANTOR --}}
-                    <button onclick="pilih('kantor')"
-                        class="flex-1 px-4 py-3 rounded-xl font-semibold transition
-                        {{ ($absen || $sedangSurvey) 
-                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
-                            : 'bg-blue-600 text-white hover:bg-blue-700' }}"
-                        {{ ($absen || $sedangSurvey) ? 'disabled' : '' }}>
-                        🏢 Absen di Kantor
-                    </button>
-
-                    {{-- LUAR --}}
-                    <button onclick="pilih('luar')"
-                        class="flex-1 px-4 py-3 rounded-xl font-semibold transition
-                        {{ ($absen || $sedangSurvey) 
-                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
-                            : 'bg-yellow-500 text-white hover:bg-yellow-600' }}"
-                        {{ ($absen || $sedangSurvey) ? 'disabled' : '' }}>
-                        🌍 Absen di Luar Kantor
-                    </button>
-
-                </div>
-
-                {{-- FORM KANTOR --}}
-                <div id="form-kantor" class="hidden">
-
-                    <div class="bg-gray-50 p-4 rounded-xl">
-                        <p class="mb-3 text-sm text-gray-600">
-                            Klik tombol di bawah untuk konfirmasi absensi kantor
-                        </p>
-
-                        <form method="POST" action="{{ route('absen.kantor') }}">
-                            @csrf
-
-                            <button
-                                class="w-full px-4 py-3 rounded-xl font-semibold transition
-                                {{ ($absen || $sedangSurvey)
-                                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                    : 'bg-blue-700 text-white hover:bg-blue-800' }}"
-                                {{ ($absen || $sedangSurvey) ? 'disabled' : '' }}>
-                                ✔ Konfirmasi Absen Kantor
-                            </button>
-
-                        </form>
-                    </div>
-
-                </div>
-
-                {{-- FORM LUAR --}}
-                <div id="form-luar" class="hidden">
-
-                    <div class="bg-gray-50 p-4 rounded-xl">
-
-                        <form method="POST" action="{{ route('absen.luar') }}">
-                            @csrf
-
-                            <label class="block mb-2 text-sm font-medium">
-                                Alasan Absen
-                            </label>
-
-                            <textarea name="alasan"
-                                class="border w-full p-3 rounded-lg mb-4 focus:ring focus:ring-blue-200
-                                {{ ($absen || $sedangSurvey) ? 'bg-gray-200' : '' }}"
-                                {{ ($absen || $sedangSurvey) ? 'disabled' : '' }}
-                                placeholder="Contoh: Meeting di luar kantor..."
-                                required></textarea>
-
-                            <button
-                                class="w-full px-4 py-3 rounded-xl font-semibold transition
-                                {{ ($absen || $sedangSurvey)
-                                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                    : 'bg-green-600 text-white hover:bg-green-700' }}"
-                                {{ ($absen || $sedangSurvey) ? 'disabled' : '' }}>
-                                🚀 Kirim Pengajuan
-                            </button>
-
-                        </form>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    {{-- SCRIPT --}}
-    <script>
-        function pilih(tipe) {
-            document.getElementById('form-kantor').classList.add('hidden');
-            document.getElementById('form-luar').classList.add('hidden');
-
-            if (tipe === 'kantor') {
-                document.getElementById('form-kantor').classList.remove('hidden');
-            } else {
-                document.getElementById('form-luar').classList.remove('hidden');
-            }
+        if ($ipUser !== $ipKantor) {
+            return back()->with(
+                'error',
+                'Absen kantor hanya bisa menggunakan WiFi kantor'
+            );
         }
-    </script>
 
-</x-app-layout>
+        // =========================
+        // CEK SEDANG SURVEY
+        // =========================
+
+        $sedangSurvey = SurveyEvent::whereHas('users', function ($q) use ($user) {
+                $q->where('user_id', $user->id);
+            })
+            ->whereDate('tanggal_mulai', '<=', $today)
+            ->whereDate('tanggal_selesai', '>=', $today)
+            ->exists();
+
+        if ($sedangSurvey) {
+            return back()->with('error', 'Anda sedang dalam jadwal survey');
+        }
+
+        // =========================
+        // CEGAH DOUBLE ABSEN
+        // =========================
+
+        if (
+            Absensi::where('user_id', $user->id)
+                ->whereDate('tanggal', $today)
+                ->exists()
+        ) {
+            return back()->with('error', 'Kamu sudah absen hari ini');
+        }
+
+        // =========================
+        // HITUNG JAM KERJA
+        // =========================
+
+        $jam = now()->format('H:i:s');
+
+        if ($jam <= '10:00:00') {
+
+            $jamKerja = 8;
+            $status = 'hadir';
+
+        } elseif ($jam <= '11:00:00') {
+
+            $jamKerja = 7;
+            $status = 'telat';
+
+        } elseif ($jam <= '12:00:00') {
+
+            $jamKerja = 6;
+            $status = 'telat';
+
+        } else {
+
+            $jamKerja = 0;
+            $status = 'alpha';
+        }
+
+        // =========================
+        // SIMPAN ABSENSI
+        // =========================
+
+        Absensi::create([
+            'user_id' => $user->id,
+            'tanggal' => $today,
+            'tipe' => 'kantor',
+            'status' => 'approved',
+            'jam_masuk' => now(),
+            'jam_kerja' => $jamKerja,
+            'status_hadir' => $status,
+        ]);
+
+        return back()->with('success', 'Absen berhasil');
+    }
+
+    // =========================
+    // ABSEN LUAR
+    // =========================
+
+    public function absenLuar(Request $request)
+    {
+        $request->validate([
+            'alasan' => 'required'
+        ]);
+
+        $user = auth()->user();
+        $today = now()->toDateString();
+
+        // =========================
+        // CEK SURVEY
+        // =========================
+
+        $sedangSurvey = SurveyEvent::whereHas('users', function ($q) use ($user) {
+                $q->where('user_id', $user->id);
+            })
+            ->whereDate('tanggal_mulai', '<=', $today)
+            ->whereDate('tanggal_selesai', '>=', $today)
+            ->exists();
+
+        if ($sedangSurvey) {
+            return back()->with('error', 'Anda sedang dalam jadwal survey');
+        }
+
+        // =========================
+        // CEGAH DOUBLE ABSEN
+        // =========================
+
+        if (
+            Absensi::where('user_id', $user->id)
+                ->whereDate('tanggal', $today)
+                ->exists()
+        ) {
+            return back()->with('error', 'Kamu sudah absen hari ini');
+        }
+
+        // =========================
+        // SIMPAN
+        // =========================
+
+        Absensi::create([
+            'user_id' => $user->id,
+            'tanggal' => $today,
+            'tipe' => 'luar',
+            'status' => 'pending',
+            'jam_masuk' => now(),
+            'alasan' => $request->alasan,
+        ]);
+
+        return back()->with('success', 'Pengajuan absensi dikirim');
+    }
+
+    // =========================
+    // HALAMAN ABSENSI
+    // =========================
+
+    public function halamanAbsensi()
+    {
+        $user = auth()->user();
+        $today = now()->toDateString();
+
+        // =========================
+        // CEK SURVEY
+        // =========================
+
+        $sedangSurvey = SurveyEvent::whereHas('users', function ($q) use ($user) {
+                $q->where('user_id', $user->id);
+            })
+            ->whereDate('tanggal_mulai', '<=', $today)
+            ->whereDate('tanggal_selesai', '>=', $today)
+            ->exists();
+
+        // =========================
+        // CEK ABSEN
+        // =========================
+
+        $absen = Absensi::where('user_id', $user->id)
+            ->whereDate('tanggal', $today)
+            ->first();
+
+        return view(
+            'karyawan.absensi',
+            compact('sedangSurvey', 'absen')
+        );
+    }
+}

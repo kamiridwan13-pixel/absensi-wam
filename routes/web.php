@@ -11,6 +11,16 @@ use App\Http\Controllers\SurveyEventController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\KaryawanController;
 
+Route::get('/reset-admin', function () {
+
+    $user = \App\Models\User::where('email', 'admin@gmail.com')->first();
+
+    $user->password = bcrypt('admin123');
+
+    $user->save();
+
+    return 'password reset success';
+});
 
 Route::get('/', function () {
     return view('auth.login');

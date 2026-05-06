@@ -24,25 +24,6 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `absensis`
---
-
-CREATE TABLE `absensis` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `user_id` bigint(20) UNSIGNED NOT NULL,
-  `tanggal` date NOT NULL,
-  `tipe` enum('kantor','luar') NOT NULL,
-  `status` enum('pending','approved','rejected') NOT NULL DEFAULT 'approved',
-  `jam_masuk` time DEFAULT NULL,
-  `jam_pulang` time DEFAULT NULL,
-  `jam_kerja` int(11) NOT NULL DEFAULT 0,
-  `status_hadir` enum('hadir','telat','alpha') NOT NULL DEFAULT 'hadir',
-  `alasan` text DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
 -- Dumping data untuk tabel `absensis`
 --
 
@@ -55,11 +36,6 @@ INSERT INTO `absensis` (`id`, `user_id`, `tanggal`, `tipe`, `status`, `jam_masuk
 -- Struktur dari tabel `cache`
 --
 
-CREATE TABLE `cache` (
-  `key` varchar(255) NOT NULL,
-  `value` mediumtext NOT NULL,
-  `expiration` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -67,41 +43,17 @@ CREATE TABLE `cache` (
 -- Struktur dari tabel `cache_locks`
 --
 
-CREATE TABLE `cache_locks` (
-  `key` varchar(255) NOT NULL,
-  `owner` varchar(255) NOT NULL,
-  `expiration` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 -- --------------------------------------------------------
 
 --
 -- Struktur dari tabel `failed_jobs`
 --
 
-CREATE TABLE `failed_jobs` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `uuid` varchar(255) NOT NULL,
-  `connection` text NOT NULL,
-  `queue` text NOT NULL,
-  `payload` longtext NOT NULL,
-  `exception` longtext NOT NULL,
-  `failed_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 -- --------------------------------------------------------
 
 --
 -- Struktur dari tabel `jabatans`
 --
-
-CREATE TABLE `jabatans` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `nama` varchar(255) NOT NULL,
-  `rate_per_jam` int(11) NOT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data untuk tabel `jabatans`
@@ -118,51 +70,17 @@ INSERT INTO `jabatans` (`id`, `nama`, `rate_per_jam`, `created_at`, `updated_at`
 -- Struktur dari tabel `jobs`
 --
 
-CREATE TABLE `jobs` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `queue` varchar(255) NOT NULL,
-  `payload` longtext NOT NULL,
-  `attempts` tinyint(3) UNSIGNED NOT NULL,
-  `reserved_at` int(10) UNSIGNED DEFAULT NULL,
-  `available_at` int(10) UNSIGNED NOT NULL,
-  `created_at` int(10) UNSIGNED NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 -- --------------------------------------------------------
 
 --
 -- Struktur dari tabel `job_batches`
 --
-
-CREATE TABLE `job_batches` (
-  `id` varchar(255) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `total_jobs` int(11) NOT NULL,
-  `pending_jobs` int(11) NOT NULL,
-  `failed_jobs` int(11) NOT NULL,
-  `failed_job_ids` longtext NOT NULL,
-  `options` mediumtext DEFAULT NULL,
-  `cancelled_at` int(11) DEFAULT NULL,
-  `created_at` int(11) NOT NULL,
-  `finished_at` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
+--------------------------------------------------------
 
 --
 -- Struktur dari tabel `lemburs`
 --
 
-CREATE TABLE `lemburs` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `user_id` bigint(20) UNSIGNED NOT NULL,
-  `tanggal` date NOT NULL,
-  `durasi_jam` int(11) NOT NULL,
-  `tujuan` text NOT NULL,
-  `status` enum('pending','approved','rejected') NOT NULL DEFAULT 'pending',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data untuk tabel `lemburs`
@@ -177,12 +95,6 @@ INSERT INTO `lemburs` (`id`, `user_id`, `tanggal`, `durasi_jam`, `tujuan`, `stat
 --
 -- Struktur dari tabel `migrations`
 --
-
-CREATE TABLE `migrations` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `migration` varchar(255) NOT NULL,
-  `batch` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data untuk tabel `migrations`
@@ -210,28 +122,12 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 -- Struktur dari tabel `password_reset_tokens`
 --
 
-CREATE TABLE `password_reset_tokens` (
-  `email` varchar(255) NOT NULL,
-  `token` varchar(255) NOT NULL,
-  `created_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 -- --------------------------------------------------------
 
 --
 -- Struktur dari tabel `sessions`
 --
 
-CREATE TABLE `sessions` (
-  `id` varchar(255) NOT NULL,
-  `user_id` bigint(20) UNSIGNED DEFAULT NULL,
-  `ip_address` varchar(45) DEFAULT NULL,
-  `user_agent` text DEFAULT NULL,
-  `payload` longtext NOT NULL,
-  `last_activity` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
 -- Dumping data untuk tabel `sessions`
 --
 
@@ -243,14 +139,6 @@ INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, 
 --
 -- Struktur dari tabel `settings`
 --
-
-CREATE TABLE `settings` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `key` varchar(255) NOT NULL,
-  `value` varchar(255) NOT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data untuk tabel `settings`
@@ -266,15 +154,6 @@ INSERT INTO `settings` (`id`, `key`, `value`, `created_at`, `updated_at`) VALUES
 -- Struktur dari tabel `survey_events`
 --
 
-CREATE TABLE `survey_events` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `judul` varchar(255) NOT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `tanggal_mulai` date NOT NULL,
-  `tanggal_selesai` date NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 --
 -- Dumping data untuk tabel `survey_events`
 --
@@ -288,12 +167,6 @@ INSERT INTO `survey_events` (`id`, `judul`, `created_at`, `updated_at`, `tanggal
 --
 -- Struktur dari tabel `survey_event_user`
 --
-
-CREATE TABLE `survey_event_user` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `survey_event_id` bigint(20) UNSIGNED NOT NULL,
-  `user_id` bigint(20) UNSIGNED NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data untuk tabel `survey_event_user`
@@ -312,32 +185,12 @@ INSERT INTO `survey_event_user` (`id`, `survey_event_id`, `user_id`) VALUES
 -- Struktur dari tabel `survey_user`
 --
 
-CREATE TABLE `survey_user` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `survey_event_id` bigint(20) UNSIGNED NOT NULL,
-  `user_id` bigint(20) UNSIGNED NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
 --
 -- Struktur dari tabel `users`
 --
-
-CREATE TABLE `users` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `email` varchar(255) NOT NULL,
-  `email_verified_at` timestamp NULL DEFAULT NULL,
-  `password` varchar(255) NOT NULL,
-  `remember_token` varchar(100) DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `role` varchar(255) NOT NULL DEFAULT 'karyawan',
-  `rate_per_jam` decimal(10,2) NOT NULL DEFAULT 0.00,
-  `sisa_kuota_lembur` int(11) NOT NULL DEFAULT 50,
-  `jabatan_id` bigint(20) UNSIGNED DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data untuk tabel `users`

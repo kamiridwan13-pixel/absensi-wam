@@ -23,7 +23,7 @@ class AdminController extends Controller
         return view('admin.absensi', compact('data'));
     }
 
-    pubpublic function approve($id)
+    public function approve($id)
 {
     $absen = Absensi::findOrFail($id);
 

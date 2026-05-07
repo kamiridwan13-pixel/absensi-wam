@@ -5,64 +5,98 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Absensi;
 use App\Models\SurveyEvent;
-use Carbon\Carbon;
+use App\Models\Setting;
 
 class AbsensiController extends Controller
 {
-    // =========================
+    // =====================================================
     // ABSEN KANTOR
-    // =========================
+    // =====================================================
+
     public function absenKantor(Request $request)
     {
         $user = auth()->user();
         $today = now()->toDateString();
 
-        // =========================
+        // =====================================================
         // VALIDASI WIFI KANTOR
-        // =========================
+        // =====================================================
 
-        // GANTI DENGAN IP WIFI KANTOR KAMU
-           $ipKantor = '103.56.80.19';
+        // ambil IP kantor dari settings
+        $ipKantor = Setting::where('key', 'ip_kantor')
+            ->value('value');
 
-            $ipUser = trim(explode(',', $request->header('X-Forwarded-For'))[0]);
-dd($request->header('X-Forwarded-For'));
-            if ($ipUser !== $ipKantor) {
+        // ambil real IP user dari Railway proxy
+        $forwarded = $request->header('X-Forwarded-For');
+
+        if ($forwarded) {
+
+            $ipUser = trim(explode(',', $forwarded)[0]);
+
+        } else {
+
+            $ipUser = $request->ip();
+        }
+
+        // izinkan localhost
+        if (
+            $ipUser !== '127.0.0.1' &&
+            $ipUser !== '::1'
+        ) {
+
+            // cek apakah IP sesuai
+            if (
+                $ipKantor &&
+                substr($ipUser, 0, strlen($ipKantor)) !== $ipKantor
+            ) {
 
                 return back()->with(
                     'error',
                     'Absen kantor hanya bisa menggunakan WiFi kantor'
                 );
             }
-        // =========================
+        }
+
+        // =====================================================
         // CEK SEDANG SURVEY
-        // =========================
+        // =====================================================
 
         $sedangSurvey = SurveyEvent::whereHas('users', function ($q) use ($user) {
+
                 $q->where('user_id', $user->id);
+
             })
             ->whereDate('tanggal_mulai', '<=', $today)
             ->whereDate('tanggal_selesai', '>=', $today)
             ->exists();
 
         if ($sedangSurvey) {
-            return back()->with('error', 'Anda sedang dalam jadwal survey');
+
+            return back()->with(
+                'error',
+                'Anda sedang dalam jadwal survey'
+            );
         }
 
-        // =========================
+        // =====================================================
         // CEGAH DOUBLE ABSEN
-        // =========================
+        // =====================================================
 
-        if (
-            Absensi::where('user_id', $user->id)
-                ->whereDate('tanggal', $today)
-                ->exists()
-        ) {
-            return back()->with('error', 'Kamu sudah absen hari ini');
+        $sudahAbsen = Absensi::where('user_id', $user->id)
+            ->whereDate('tanggal', $today)
+            ->exists();
+
+        if ($sudahAbsen) {
+
+            return back()->with(
+                'error',
+                'Kamu sudah absen hari ini'
+            );
         }
 
-        // =========================
-        // HITUNG JAM KERJA
-        // =========================
+        // =====================================================
+        // HITUNG STATUS HADIR
+        // =====================================================
 
         $jam = now()->format('H:i:s');
 
@@ -87,11 +121,12 @@ dd($request->header('X-Forwarded-For'));
             $status = 'alpha';
         }
 
-        // =========================
+        // =====================================================
         // SIMPAN ABSENSI
-        // =========================
+        // =====================================================
 
         Absensi::create([
+
             'user_id' => $user->id,
             'tanggal' => $today,
             'tipe' => 'kantor',
@@ -99,14 +134,18 @@ dd($request->header('X-Forwarded-For'));
             'jam_masuk' => now(),
             'jam_kerja' => $jamKerja,
             'status_hadir' => $status,
+
         ]);
 
-        return back()->with('success', 'Absen berhasil');
+        return back()->with(
+            'success',
+            'Absen kantor berhasil'
+        );
     }
 
-    // =========================
+    // =====================================================
     // ABSEN LUAR
-    // =========================
+    // =====================================================
 
     public function absenLuar(Request $request)
     {
@@ -117,72 +156,89 @@ dd($request->header('X-Forwarded-For'));
         $user = auth()->user();
         $today = now()->toDateString();
 
-        // =========================
-        // CEK SURVEY
-        // =========================
+        // =====================================================
+        // CEK SEDANG SURVEY
+        // =====================================================
 
         $sedangSurvey = SurveyEvent::whereHas('users', function ($q) use ($user) {
+
                 $q->where('user_id', $user->id);
+
             })
             ->whereDate('tanggal_mulai', '<=', $today)
             ->whereDate('tanggal_selesai', '>=', $today)
             ->exists();
 
         if ($sedangSurvey) {
-            return back()->with('error', 'Anda sedang dalam jadwal survey');
+
+            return back()->with(
+                'error',
+                'Anda sedang dalam jadwal survey'
+            );
         }
 
-        // =========================
+        // =====================================================
         // CEGAH DOUBLE ABSEN
-        // =========================
+        // =====================================================
 
-        if (
-            Absensi::where('user_id', $user->id)
-                ->whereDate('tanggal', $today)
-                ->exists()
-        ) {
-            return back()->with('error', 'Kamu sudah absen hari ini');
+        $sudahAbsen = Absensi::where('user_id', $user->id)
+            ->whereDate('tanggal', $today)
+            ->exists();
+
+        if ($sudahAbsen) {
+
+            return back()->with(
+                'error',
+                'Kamu sudah absen hari ini'
+            );
         }
 
-        // =========================
-        // SIMPAN
-        // =========================
+        // =====================================================
+        // SIMPAN ABSENSI LUAR
+        // =====================================================
 
         Absensi::create([
+
             'user_id' => $user->id,
             'tanggal' => $today,
             'tipe' => 'luar',
             'status' => 'pending',
             'jam_masuk' => now(),
             'alasan' => $request->alasan,
+
         ]);
 
-        return back()->with('success', 'Pengajuan absensi dikirim');
+        return back()->with(
+            'success',
+            'Pengajuan absensi luar dikirim'
+        );
     }
 
-    // =========================
+    // =====================================================
     // HALAMAN ABSENSI
-    // =========================
+    // =====================================================
 
     public function halamanAbsensi()
     {
         $user = auth()->user();
         $today = now()->toDateString();
 
-        // =========================
+        // =====================================================
         // CEK SURVEY
-        // =========================
+        // =====================================================
 
         $sedangSurvey = SurveyEvent::whereHas('users', function ($q) use ($user) {
+
                 $q->where('user_id', $user->id);
+
             })
             ->whereDate('tanggal_mulai', '<=', $today)
             ->whereDate('tanggal_selesai', '>=', $today)
             ->exists();
 
-        // =========================
-        // CEK ABSEN
-        // =========================
+        // =====================================================
+        // CEK ABSEN HARI INI
+        // =====================================================
 
         $absen = Absensi::where('user_id', $user->id)
             ->whereDate('tanggal', $today)
@@ -190,7 +246,10 @@ dd($request->header('X-Forwarded-For'));
 
         return view(
             'karyawan.absensi',
-            compact('sedangSurvey', 'absen')
+            compact(
+                'sedangSurvey',
+                'absen'
+            )
         );
     }
 }

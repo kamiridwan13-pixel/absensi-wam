@@ -23,49 +23,81 @@ class AdminController extends Controller
         return view('admin.absensi', compact('data'));
     }
 
-    public function approve(Request $request, $id)
-    {
-        $request->validate([
-            'jam_masuk' => 'required'
-        ]);
+    pubpublic function approve($id)
+{
+    $absen = Absensi::findOrFail($id);
 
-        $absen = Absensi::findOrFail($id);
+    // =====================================
+    // JIKA ABSEN LUAR
+    // =====================================
 
-        $jamMasuk = $request->jam_masuk;
+    if ($absen->tipe == 'luar') {
 
-        // default aman
-        $jamKerja = 0;
-        $status = 'alpha';
+        $jam = \Carbon\Carbon::parse($absen->jam_masuk)
+            ->format('H:i:s');
 
-        if ($jamMasuk <= '10:00') {
+        if ($jam <= '10:00:00') {
+
             $jamKerja = 8;
             $status = 'hadir';
-        } elseif ($jamMasuk <= '11:00') {
+
+        } elseif ($jam <= '11:00:00') {
+
             $jamKerja = 7;
             $status = 'telat';
-        } elseif ($jamMasuk <= '12:00') {
+
+        } elseif ($jam <= '12:00:00') {
+
             $jamKerja = 6;
             $status = 'telat';
+
+        } else {
+
+            $jamKerja = 0;
+            $status = 'alpha';
         }
 
         $absen->update([
-            'jam_masuk' => $jamMasuk,
+
+            'status' => 'approved',
             'jam_kerja' => $jamKerja,
-            'status_hadir' => $request->status_hadir ?? $status,
-            'status' => 'approved'
+            'status_hadir' => $status,
+
         ]);
 
-        return back()->with('success', 'Absensi di-approve');
+        return back()->with(
+            'success',
+            'Absensi berhasil disetujui'
+        );
     }
 
-    public function reject($id)
-    {
-        Absensi::findOrFail($id)->update([
-            'status' => 'rejected'
-        ]);
+    // =====================================
+    // DEFAULT
+    // =====================================
 
-        return back()->with('error', 'Absensi ditolak');
-    }
+    $absen->update([
+        'status' => 'approved'
+    ]);
+
+    return back()->with(
+        'success',
+        'Absensi berhasil disetujui'
+    );
+}
+
+   public function reject($id)
+{
+    $absen = Absensi::findOrFail($id);
+
+    $absen->update([
+        'status' => 'rejected'
+    ]);
+
+    return back()->with(
+        'success',
+        'Absensi berhasil ditolak'
+    );
+}
 
     // ===================== LEMBUR =====================
 

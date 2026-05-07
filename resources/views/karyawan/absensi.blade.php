@@ -22,17 +22,15 @@ class AbsensiController extends Controller
         // =========================
 
         // GANTI DENGAN IP WIFI KANTOR KAMU
-        $ipKantor = '103.56.80.19';
+            $ipUser = $request->ip();
 
-        $ipUser = $request->ip();
+            if (substr($ipUser, 0, 10) !== '103.56.80.19') {
 
-        if ($ipUser !== $ipKantor) {
-            return back()->with(
-                'error',
-                'Absen kantor hanya bisa menggunakan WiFi kantor'
-            );
-        }
-
+                return back()->with(
+                    'error',
+                    'Absen kantor hanya bisa menggunakan WiFi kantor'
+                );
+            }
         // =========================
         // CEK SEDANG SURVEY
         // =========================

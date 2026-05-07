@@ -22,7 +22,7 @@ class CheckOfficeIP
         return $next($request);
     }
 
-    if (!str_starts_with($ip, '192.168.1.')) {
+    if (!str_starts_with($ip, '103.56.80.')) {
         return back()->with('error', 'Harus pakai WiFi kantor');
     }
 

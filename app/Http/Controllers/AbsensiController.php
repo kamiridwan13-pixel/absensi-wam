@@ -23,6 +23,7 @@ class AbsensiController extends Controller
 
         // GANTI DENGAN IP WIFI KANTOR KAMU
            $ipUser = $request->ip();
+           dd($ipUser);
 
             if (substr($ipUser, 0, 9) !== '103.56.80') {
 

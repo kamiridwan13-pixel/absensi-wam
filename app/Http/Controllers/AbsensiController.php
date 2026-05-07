@@ -9,12 +9,32 @@ use Carbon\Carbon;
 
 class AbsensiController extends Controller
 {
-    public function absenKantor()
+    // =========================
+    // ABSEN KANTOR
+    // =========================
+    public function absenKantor(Request $request)
     {
         $user = auth()->user();
         $today = now()->toDateString();
 
-        // 🔥 CEK SEDANG SURVEY
+        // =========================
+        // VALIDASI WIFI KANTOR
+        // =========================
+
+        // GANTI DENGAN IP WIFI KANTOR KAMU
+            $ipUser = $request->ip();
+
+            if (substr($ipUser, 0, 10) !== '103.56.80.19') {
+
+                return back()->with(
+                    'error',
+                    'Absen kantor hanya bisa menggunakan WiFi kantor'
+                );
+            }
+        // =========================
+        // CEK SEDANG SURVEY
+        // =========================
+
         $sedangSurvey = SurveyEvent::whereHas('users', function ($q) use ($user) {
                 $q->where('user_id', $user->id);
             })
@@ -26,26 +46,48 @@ class AbsensiController extends Controller
             return back()->with('error', 'Anda sedang dalam jadwal survey');
         }
 
-        // ❗ cegah double absen
-        if (Absensi::where('user_id', $user->id)->whereDate('tanggal', $today)->exists()) {
+        // =========================
+        // CEGAH DOUBLE ABSEN
+        // =========================
+
+        if (
+            Absensi::where('user_id', $user->id)
+                ->whereDate('tanggal', $today)
+                ->exists()
+        ) {
             return back()->with('error', 'Kamu sudah absen hari ini');
         }
+
+        // =========================
+        // HITUNG JAM KERJA
+        // =========================
 
         $jam = now()->format('H:i:s');
 
         if ($jam <= '10:00:00') {
+
             $jamKerja = 8;
             $status = 'hadir';
+
         } elseif ($jam <= '11:00:00') {
+
             $jamKerja = 7;
             $status = 'telat';
+
         } elseif ($jam <= '12:00:00') {
+
             $jamKerja = 6;
             $status = 'telat';
+
         } else {
+
             $jamKerja = 0;
             $status = 'alpha';
         }
+
+        // =========================
+        // SIMPAN ABSENSI
+        // =========================
 
         Absensi::create([
             'user_id' => $user->id,
@@ -60,6 +102,10 @@ class AbsensiController extends Controller
         return back()->with('success', 'Absen berhasil');
     }
 
+    // =========================
+    // ABSEN LUAR
+    // =========================
+
     public function absenLuar(Request $request)
     {
         $request->validate([
@@ -69,7 +115,10 @@ class AbsensiController extends Controller
         $user = auth()->user();
         $today = now()->toDateString();
 
-        // 🔥 CEK SEDANG SURVEY
+        // =========================
+        // CEK SURVEY
+        // =========================
+
         $sedangSurvey = SurveyEvent::whereHas('users', function ($q) use ($user) {
                 $q->where('user_id', $user->id);
             })
@@ -81,10 +130,21 @@ class AbsensiController extends Controller
             return back()->with('error', 'Anda sedang dalam jadwal survey');
         }
 
-        // ❗ cegah double absen
-        if (Absensi::where('user_id', $user->id)->whereDate('tanggal', $today)->exists()) {
+        // =========================
+        // CEGAH DOUBLE ABSEN
+        // =========================
+
+        if (
+            Absensi::where('user_id', $user->id)
+                ->whereDate('tanggal', $today)
+                ->exists()
+        ) {
             return back()->with('error', 'Kamu sudah absen hari ini');
         }
+
+        // =========================
+        // SIMPAN
+        // =========================
 
         Absensi::create([
             'user_id' => $user->id,
@@ -98,12 +158,19 @@ class AbsensiController extends Controller
         return back()->with('success', 'Pengajuan absensi dikirim');
     }
 
+    // =========================
+    // HALAMAN ABSENSI
+    // =========================
+
     public function halamanAbsensi()
     {
         $user = auth()->user();
         $today = now()->toDateString();
 
-        // 🔥 CEK SURVEY
+        // =========================
+        // CEK SURVEY
+        // =========================
+
         $sedangSurvey = SurveyEvent::whereHas('users', function ($q) use ($user) {
                 $q->where('user_id', $user->id);
             })
@@ -111,11 +178,17 @@ class AbsensiController extends Controller
             ->whereDate('tanggal_selesai', '>=', $today)
             ->exists();
 
-        // 🔥 CEK ABSEN HARI INI
+        // =========================
+        // CEK ABSEN
+        // =========================
+
         $absen = Absensi::where('user_id', $user->id)
             ->whereDate('tanggal', $today)
             ->first();
 
-        return view('karyawan.absensi', compact('sedangSurvey', 'absen'));
+        return view(
+            'karyawan.absensi',
+            compact('sedangSurvey', 'absen')
+        );
     }
 }

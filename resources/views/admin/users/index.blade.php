@@ -1,109 +1,181 @@
 <x-app-layout>
-<div class="flex">
 
-<x-sidebar-admin />
+    <div class="flex flex-col md:flex-row bg-gray-100 min-h-screen overflow-x-hidden">
 
-<div class="flex-1 p-6 bg-gray-100 min-h-screen">
+        {{-- SIDEBAR --}}
+        <x-sidebar-admin />
 
-<div class="max-w-6xl mx-auto">
+        {{-- CONTENT --}}
+        <div class="flex-1 p-4 md:p-6">
 
-{{-- HEADER --}}
-<div class="flex justify-between items-center mb-6">
-    <h1 class="text-2xl font-bold">👥 Manajemen Karyawan</h1>
+            <div class="max-w-7xl mx-auto">
 
-    <a href="/admin/users/create"
-       class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl shadow transition">
-        + Tambah Karyawan
-    </a>
-</div>
+                {{-- HEADER --}}
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
 
-{{-- CARD TABLE --}}
-<div class="bg-white rounded-2xl shadow overflow-hidden">
+                    <div>
 
-<table class="w-full text-sm">
+                        <h1 class="text-2xl md:text-3xl font-bold text-gray-800 leading-tight">
+                            👥 Manajemen Karyawan
+                        </h1>
 
-    <thead class="bg-gray-100 text-gray-700">
-        <tr>
-            <th class="p-4 text-left">Nama</th>
-            <th class="p-4 text-left">Email</th>
-            <th class="p-4 text-left">Jabatan</th>
-            <th class="p-4 text-left">Role</th>
-            <th class="p-4 text-left">Aksi</th>
-        </tr>
-    </thead>
+                        <p class="text-sm md:text-base text-gray-500 mt-1">
+                            Kelola data dan informasi seluruh karyawan.
+                        </p>
 
-    <tbody>
+                    </div>
 
-        @forelse($users as $u)
-        <tr class="border-t hover:bg-gray-50 transition">
+                    {{-- BUTTON --}}
+                    <a href="/admin/users/create"
+                       class="w-full sm:w-auto text-center bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-xl shadow-sm font-semibold transition duration-300">
+                        + Tambah Karyawan
+                    </a>
 
-            {{-- NAMA --}}
-            <td class="p-4 font-medium">
-                {{ $u->name }}
-            </td>
+                </div>
 
-            {{-- EMAIL --}}
-            <td class="p-4 text-gray-600">
-                {{ $u->email }}
-            </td>
+                {{-- TABLE CARD --}}
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 md:p-6">
 
-            {{-- JABATAN --}}
-            <td class="p-4">
-                <span class="bg-gray-100 px-3 py-1 rounded-full text-xs">
-                    {{ $u->jabatan->nama ?? '-' }}
-                </span>
-            </td>
+                    <div class="overflow-x-auto">
 
-            {{-- ROLE --}}
-            <td class="p-4">
-                @if($u->role == 'admin')
-                    <span class="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-xs">
-                        Admin
-                    </span>
-                @else
-                    <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs">
-                        Karyawan
-                    </span>
-                @endif
-            </td>
+                        <table class="w-full min-w-[900px] text-sm">
 
-            {{-- AKSI --}}
-            <td class="p-4 flex gap-2">
+                            {{-- TABLE HEAD --}}
+                            <thead class="bg-gray-100 text-gray-700">
 
-                <a href="/admin/users/{{ $u->id }}/edit"
-                   class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-lg text-xs transition">
-                    ✏ Edit
-                </a>
+                                <tr>
 
-                <form action="/admin/users/{{ $u->id }}" method="POST"
-                      onsubmit="return confirm('Yakin mau hapus?')">
-                    @csrf
-                    @method('DELETE')
+                                    <th class="p-4 text-left rounded-l-xl font-semibold">
+                                        Nama
+                                    </th>
 
-                    <button class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-lg text-xs transition">
-                        🗑 Hapus
-                    </button>
-                </form>
+                                    <th class="p-4 text-left font-semibold">
+                                        Email
+                                    </th>
 
-            </td>
+                                    <th class="p-4 text-left font-semibold">
+                                        Jabatan
+                                    </th>
 
-        </tr>
-        @empty
-        <tr>
-            <td colspan="5" class="text-center p-6 text-gray-500">
-                Belum ada data karyawan
-            </td>
-        </tr>
-        @endforelse
+                                    <th class="p-4 text-left font-semibold">
+                                        Role
+                                    </th>
 
-    </tbody>
+                                    <th class="p-4 text-left rounded-r-xl font-semibold">
+                                        Aksi
+                                    </th>
 
-</table>
+                                </tr>
 
-</div>
+                            </thead>
 
-</div>
+                            {{-- TABLE BODY --}}
+                            <tbody>
 
-</div>
-</div>
+                                @forelse($users as $u)
+
+                                    <tr class="border-t hover:bg-gray-50 transition duration-200">
+
+                                        {{-- NAMA --}}
+                                        <td class="p-4 font-medium text-gray-800 whitespace-nowrap">
+                                            {{ $u->name }}
+                                        </td>
+
+                                        {{-- EMAIL --}}
+                                        <td class="p-4 text-gray-600 break-words">
+                                            {{ $u->email }}
+                                        </td>
+
+                                        {{-- JABATAN --}}
+                                        <td class="p-4">
+
+                                            <span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap">
+                                                {{ $u->jabatan->nama ?? '-' }}
+                                            </span>
+
+                                        </td>
+
+                                        {{-- ROLE --}}
+                                        <td class="p-4">
+
+                                            @if($u->role == 'admin')
+
+                                                <span class="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap">
+                                                    Admin
+                                                </span>
+
+                                            @else
+
+                                                <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap">
+                                                    Karyawan
+                                                </span>
+
+                                            @endif
+
+                                        </td>
+
+                                        {{-- AKSI --}}
+                                        <td class="p-4">
+
+                                            <div class="flex flex-wrap gap-2">
+
+                                                {{-- EDIT --}}
+                                                <a href="/admin/users/{{ $u->id }}/edit"
+                                                   class="inline-flex items-center bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-xl text-xs font-semibold transition duration-300 shadow-sm whitespace-nowrap">
+
+                                                    ✏ Edit
+
+                                                </a>
+
+                                                {{-- DELETE --}}
+                                                <form action="/admin/users/{{ $u->id }}"
+                                                      method="POST"
+                                                      onsubmit="return confirm('Yakin mau hapus?')">
+
+                                                    @csrf
+                                                    @method('DELETE')
+
+                                                    <button
+                                                        class="inline-flex items-center bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl text-xs font-semibold transition duration-300 shadow-sm whitespace-nowrap"
+                                                    >
+                                                        🗑 Hapus
+                                                    </button>
+
+                                                </form>
+
+                                            </div>
+
+                                        </td>
+
+                                    </tr>
+
+                                @empty
+
+                                    <tr>
+
+                                        <td colspan="5"
+                                            class="text-center p-8 text-gray-400">
+
+                                            Belum ada data karyawan
+
+                                        </td>
+
+                                    </tr>
+
+                                @endforelse
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
 </x-app-layout>

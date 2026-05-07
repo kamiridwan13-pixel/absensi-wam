@@ -1,35 +1,86 @@
 <x-app-layout>
-<div class="flex">
 
-<x-sidebar-admin />
+    <div class="flex flex-col md:flex-row bg-gray-100 min-h-screen overflow-x-hidden">
 
-<div class="flex-1 p-6 bg-gray-100 min-h-screen">
+        {{-- SIDEBAR --}}
+        <x-sidebar-admin />
 
-<h1 class="text-xl font-bold mb-4">Setting</h1>
+        {{-- CONTENT --}}
+        <div class="flex-1 p-4 md:p-6">
 
-<div class="bg-white p-6 rounded shadow max-w-lg">
+            <div class="max-w-xl mx-auto">
 
-<form method="POST" action="/admin/setting">
-@csrf
+                {{-- HEADER --}}
+                <div class="mb-6">
 
-<label>Rate Lembur</label>
-<input type="number" name="rate_lembur"
-       value="{{ $rate_lembur }}"
-       class="border p-2 w-full mb-3">
+                    <h1 class="text-2xl md:text-3xl font-bold text-gray-800 leading-tight">
+                        ⚙️ Setting
+                    </h1>
 
-<label>SPJ</label>
-<input type="number" name="spj"
-       value="{{ $spj }}"
-       class="border p-2 w-full mb-3">
+                    <p class="text-sm md:text-base text-gray-500 mt-1">
+                        Kelola pengaturan sistem payroll dan lembur.
+                    </p>
 
-<button class="bg-blue-600 text-white px-4 py-2 rounded">
-    Simpan
-</button>
+                </div>
 
-</form>
+                {{-- CARD --}}
+                <div class="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-100">
 
-</div>
+                    <form method="POST"
+                          action="/admin/setting"
+                          class="space-y-5">
 
-</div>
-</div>
+                        @csrf
+
+                        {{-- RATE LEMBUR --}}
+                        <div>
+
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                Rate Lembur
+                            </label>
+
+                            <input
+                                type="number"
+                                name="rate_lembur"
+                                value="{{ $rate_lembur }}"
+                                class="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition text-sm md:text-base"
+                                placeholder="Masukkan rate lembur"
+                            >
+
+                        </div>
+
+                        {{-- SPJ --}}
+                        <div>
+
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                SPJ
+                            </label>
+
+                            <input
+                                type="number"
+                                name="spj"
+                                value="{{ $spj }}"
+                                class="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition text-sm md:text-base"
+                                placeholder="Masukkan nominal SPJ"
+                            >
+
+                        </div>
+
+                        {{-- BUTTON --}}
+                        <button
+                            class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold transition duration-300 shadow-sm"
+                        >
+                            💾 Simpan Pengaturan
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
 </x-app-layout>

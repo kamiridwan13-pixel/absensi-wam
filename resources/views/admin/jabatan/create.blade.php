@@ -1,31 +1,86 @@
 <x-app-layout>
-<div class="flex">
 
-<x-sidebar-admin />
+    <div class="flex flex-col md:flex-row bg-gray-100 min-h-screen overflow-x-hidden">
 
-<div class="flex-1 p-6 bg-gray-100 min-h-screen">
+        {{-- SIDEBAR --}}
+        <x-sidebar-admin />
 
-<h1 class="text-xl font-bold mb-4">Tambah Jabatan</h1>
+        {{-- CONTENT --}}
+        <div class="flex-1 p-4 md:p-6">
 
-<div class="bg-white p-6 rounded shadow max-w-lg">
+            <div class="max-w-xl mx-auto">
 
-<form method="POST" action="/admin/jabatan">
-@csrf
+                {{-- HEADER --}}
+                <div class="mb-6">
 
-<input type="text" name="nama" placeholder="Nama Jabatan"
-       class="border p-2 w-full mb-3" required>
+                    <h1 class="text-2xl md:text-3xl font-bold text-gray-800 leading-tight">
+                        ➕ Tambah Jabatan
+                    </h1>
 
-<input type="number" name="rate_per_jam" placeholder="Rate per Jam"
-       class="border p-2 w-full mb-3" required>
+                    <p class="text-sm md:text-base text-gray-500 mt-1">
+                        Tambahkan data jabatan dan rate gaji per jam.
+                    </p>
 
-<button class="bg-green-600 text-white px-4 py-2 rounded">
-    Simpan
-</button>
+                </div>
 
-</form>
+                {{-- CARD --}}
+                <div class="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-100">
 
-</div>
+                    <form method="POST"
+                          action="/admin/jabatan"
+                          class="space-y-5">
 
-</div>
-</div>
+                        @csrf
+
+                        {{-- NAMA JABATAN --}}
+                        <div>
+
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                Nama Jabatan
+                            </label>
+
+                            <input
+                                type="text"
+                                name="nama"
+                                placeholder="Masukkan nama jabatan"
+                                class="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-green-200 focus:border-green-400 transition text-sm md:text-base"
+                                required
+                            >
+
+                        </div>
+
+                        {{-- RATE PER JAM --}}
+                        <div>
+
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                Rate per Jam
+                            </label>
+
+                            <input
+                                type="number"
+                                name="rate_per_jam"
+                                placeholder="Masukkan nominal rate per jam"
+                                class="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-green-200 focus:border-green-400 transition text-sm md:text-base"
+                                required
+                            >
+
+                        </div>
+
+                        {{-- BUTTON --}}
+                        <button
+                            class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-semibold transition duration-300 shadow-sm"
+                        >
+                            💾 Simpan
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
 </x-app-layout>
